@@ -12,9 +12,12 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.mirror.exception.WrongUrlException;
 import org.mirror.httpConsts.httpBasic.URLConstants;
 import org.mirror.httpConsts.httpBasic.UserAgent;
+import org.mirror.mapper.JsonInputStreamToObject;
+import org.mirror.mapper.ObjectMapperWrapper;
 import util.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,7 +75,7 @@ public class HttpClientHolder {
     }
 
 
-    public static String makeHttpCallForResponseBody(String httpClientKey, HttpRequestBuilder builder) throws IOException, ParseException {
+    public static String makeHttpCallForResponseBodyString(String httpClientKey, HttpRequestBuilder builder) throws IOException, ParseException {
         CloseableHttpClient httpClient = getHttpClient(httpClientKey);
         if (httpClient == null || StringUtils.isEmpty(httpClientKey) || httpClientKey.equals("default")) {
             log.info("Making http call using default client.");
@@ -84,7 +87,12 @@ public class HttpClientHolder {
 
         String respBody = null;
         try (CloseableHttpResponse response = httpClient.execute(request)) {
-            respBody = EntityUtils.toString(response.getEntity());
+            int statusCode = response.getCode();
+            if (statusCode == 200) {
+                respBody = EntityUtils.toString(response.getEntity());
+            } else {
+                log.error("Failed to get response, the status code is {}", statusCode);
+            }
         } catch (ParseException e) {
             log.error("Error getting response body!", e);
         } catch (IOException e) {
@@ -93,17 +101,50 @@ public class HttpClientHolder {
         return respBody;
     }
 
-    public static String makeHttpCallForResponseBody(HttpRequestBuilder builder) throws IOException, ParseException {
-        return makeHttpCallForResponseBody(null, builder);
+    public static String makeHttpCallForResponseBodyString(HttpRequestBuilder builder) throws IOException, ParseException {
+        return makeHttpCallForResponseBodyString(null, builder);
     }
 
 
+    public static Object makeHttpCallForResponseBody(HttpRequestBuilder builder, JsonInputStreamToObject func, ObjectMapperWrapper mapperWrapper) throws IOException, ParseException {
+        return makeHttpCallForResponseBody(null, builder, func, mapperWrapper);
+    }
+
+    public static Object makeHttpCallForResponseBody(String httpClientKey, HttpRequestBuilder builder, JsonInputStreamToObject func, ObjectMapperWrapper mapperWrapper) throws IOException, ParseException {
+        CloseableHttpClient httpClient = getHttpClient(httpClientKey);
+        if (httpClient == null || StringUtils.isEmpty(httpClientKey) || httpClientKey.equals("default")) {
+            log.info("Making http call using default client.");
+            httpClient = DEFAULT;
+        }
+
+
+        HttpUriRequest request = builder.build();
+        Object respBody = null;
+
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+            int statusCode = response.getCode();
+            if (statusCode == 200) {
+                InputStream content = response.getEntity().getContent();
+                respBody = func.convert(mapperWrapper, content);
+            } else {
+                log.error("Failed to get response, the status code is {}", statusCode);
+            }
+        } catch (IOException e) {
+            log.error("Error getting response body!", e);
+        }
+        return respBody;
+    }
+
+
+    /**
+     * A builder to build HttpUriRequest that can be directly used to make http call.
+     */
     public static class HttpRequestBuilder {
         private String url;
         private Map<String, String> urlParam = new HashMap<>();
         private String method;
         private String body;
-        private Map<String, String> headers= new HashMap<>();
+        private Map<String, String> headers = new HashMap<>();
 
 
         public HttpRequestBuilder() {
@@ -144,6 +185,13 @@ public class HttpClientHolder {
             return this;
         }
 
+
+        /**
+         * Building a http request object. This object has been added the essential elements to make the valid call such as cookie, user agent and crumb. Be aware that if the user does not provide cookie and crumb, we will get them from the {@link ConnectionManager}. This will cause another two http calls if the ConnectionManager does not contain valid cookie and crumb.
+         * @return HttpUriRequest that can be executed directly.
+         * @throws IOException
+         * @throws ParseException
+         */
         HttpUriRequest build() throws IOException, ParseException {
             if (StringUtils.isEmpty(url)) {
                 log.error("Request url is empty");
@@ -158,27 +206,12 @@ public class HttpClientHolder {
                 method = "GET";
             }
 
-            // Automatically adding cookie, crumb and user agent to the request (if not provided by user).
+            // Automatically adding cookie, and user agent to the request (if not provided by user). PS: We will make a http call to get the cookie if the ConnectionManager does not contain a valid cookie.
             headers.putIfAbsent("User-Agent", UserAgent.DEFAULT_AGENT);
             headers.putIfAbsent("Cookie", ConnectionManager.getInstance().getCookie(null));
 
-            String newURL = url;
-            if (urlParam != null) {
-                if (!urlParam.containsKey("crumb")) {
-                    urlParam.put("crumb", ConnectionManager.getInstance().getCrumb(null));
-                }
-                StringBuilder sb = new StringBuilder(url);
-                sb.append(URLConstants.QUESTION);
-                int c = urlParam.size();
-                for (Map.Entry<String, String> entry : urlParam.entrySet()) {
-                    c--;
-                    sb.append(entry.getKey()).append(URLConstants.EQUAL).append(entry.getValue());
-                    if (c > 0) {
-                        sb.append("&");
-                    }
-                }
-                newURL = sb.toString();
-            }
+            // Concatenate the params to url. PS: if the user don't pass the crumb param, we will do it for you. Thus, we will make a http call to get the crumb if the ConnectionManager does not contain a valid cookie.
+            String newURL = concatParamsToUrl();
 
             HttpUriRequest request = null;
             if (method.equals("GET")) {
@@ -198,6 +231,27 @@ public class HttpClientHolder {
             return request;
         }
 
+        private String concatParamsToUrl() throws ParseException, IOException {
+            String newURL = url;
+            if (urlParam != null) {
+                if (!urlParam.containsKey("crumb")) {
+                    urlParam.put("crumb", ConnectionManager.getInstance().getCrumb(null));
+                }
+                StringBuilder sb = new StringBuilder(url);
+                sb.append(URLConstants.QUESTION);
+                int c = urlParam.size();
+                for (Map.Entry<String, String> entry : urlParam.entrySet()) {
+                    c--;
+                    sb.append(entry.getKey()).append(URLConstants.EQUAL).append(entry.getValue());
+                    if (c > 0) {
+                        sb.append("&");
+                    }
+                }
+                newURL = sb.toString();
+            }
+            return newURL;
+        }
     }
+
 
 }

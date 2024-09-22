@@ -1,13 +1,12 @@
 package org.mirror.DTO.quote;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.mirror.basicDTO.ResponseWrapper;
 
 /**
  * https://query2.finance.yahoo.com/v7/finance/quote?symbols=xxxx,yyyy,...
  */
 @Data
-public class QuoteResponseWrapper {
-    QuoteResponse quoteResponse;
+public class QuoteResponseWrapper extends ResponseWrapper<QuoteResponse> {
+    private QuoteResponse quoteResponse;
 }

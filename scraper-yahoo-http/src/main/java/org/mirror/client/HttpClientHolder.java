@@ -42,6 +42,7 @@ public class HttpClientHolder {
 
     private static CloseableHttpClient getHttpClient(String httpClientKey) {
         if (StringUtils.isEmpty(httpClientKey) || httpClientKey.equals("default")) {
+            log.info("Making http call using default client.");
             return DEFAULT;
         }
         CloseableHttpClient httpClient = map.get(httpClientKey);
@@ -77,11 +78,6 @@ public class HttpClientHolder {
 
     public static String makeHttpCallForResponseBodyString(String httpClientKey, HttpRequestBuilder builder) throws IOException, ParseException {
         CloseableHttpClient httpClient = getHttpClient(httpClientKey);
-        if (httpClient == null || StringUtils.isEmpty(httpClientKey) || httpClientKey.equals("default")) {
-            log.info("Making http call using default client.");
-            httpClient = DEFAULT;
-        }
-
 
         HttpUriRequest request = builder.build();
 
@@ -112,10 +108,6 @@ public class HttpClientHolder {
 
     public static Object makeHttpCallForResponseBody(String httpClientKey, HttpRequestBuilder builder, JsonInputStreamToObject func, ObjectMapperWrapper mapperWrapper) throws IOException, ParseException {
         CloseableHttpClient httpClient = getHttpClient(httpClientKey);
-        if (httpClient == null || StringUtils.isEmpty(httpClientKey) || httpClientKey.equals("default")) {
-            log.info("Making http call using default client.");
-            httpClient = DEFAULT;
-        }
 
 
         HttpUriRequest request = builder.build();
@@ -188,6 +180,7 @@ public class HttpClientHolder {
 
         /**
          * Building a http request object. This object has been added the essential elements to make the valid call such as cookie, user agent and crumb. Be aware that if the user does not provide cookie and crumb, we will get them from the {@link ConnectionManager}. This will cause another two http calls if the ConnectionManager does not contain valid cookie and crumb.
+         *
          * @return HttpUriRequest that can be executed directly.
          * @throws IOException
          * @throws ParseException
@@ -208,6 +201,8 @@ public class HttpClientHolder {
 
             // Automatically adding cookie, and user agent to the request (if not provided by user). PS: We will make a http call to get the cookie if the ConnectionManager does not contain a valid cookie.
             headers.putIfAbsent("User-Agent", UserAgent.DEFAULT_AGENT);
+
+            // FIXME: We can not ensure that cookie!=null here, we need to fail immediately if cookie is null.
             headers.putIfAbsent("Cookie", ConnectionManager.getInstance().getCookie(null));
 
             // Concatenate the params to url. PS: if the user don't pass the crumb param, we will do it for you. Thus, we will make a http call to get the crumb if the ConnectionManager does not contain a valid cookie.
@@ -235,6 +230,7 @@ public class HttpClientHolder {
             String newURL = url;
             if (urlParam != null) {
                 if (!urlParam.containsKey("crumb")) {
+                    // FIXME: We can not ensure that crumb!=null here
                     urlParam.put("crumb", ConnectionManager.getInstance().getCrumb(null));
                 }
                 StringBuilder sb = new StringBuilder(url);

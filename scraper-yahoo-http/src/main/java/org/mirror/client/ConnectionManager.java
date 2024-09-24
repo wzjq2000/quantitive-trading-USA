@@ -75,7 +75,7 @@ public class ConnectionManager {
 
     /**
      * Make http request for getting the crumb.
-     * Before calling the method, you must ensure calling {@link #getCookie(Map<String, String>)} first.
+     * Before calling the method, you must ensure calling {@link ConnectionManager#getCookie(Map)} first.
      *
      * @param headers if you want to add some headers to the request, you can pass this map. Adding a "User-Agent" header is strongly recommended!! PS: Even if the map contains "Cookie", it will not override the cookie in this object.
      * @return crumb

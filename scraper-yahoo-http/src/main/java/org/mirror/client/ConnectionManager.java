@@ -67,12 +67,34 @@ public class ConnectionManager {
     }
 
     public static ConnectionManager getInstance() {
-        return INSTANCE;
+        boolean ifSuccess = false;
+        try {
+            ifSuccess = INSTANCE.init();
+        } catch (IOException e) {
+            log.error("Failed to initialize ConnectionManager, because the obtaining valid Cookie or crumb failed", e);
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            log.error("Failed to initialize ConnectionManager, because the obtaining valid Cookie or crumb failed", e);
+            throw new RuntimeException(e);
+        }
+        if (ifSuccess) {
+            return INSTANCE;
+        } else {
+            log.error("Failed to initialize ConnectionManager, because the obtaining valid Cookie or crumb failed");
+            throw new WrongCookieException("Failed to initialize ConnectionManager, because the obtaining valid Cookie or crumb failed");
+        }
+    }
+
+    public boolean init() throws IOException, ParseException {
+        INSTANCE.getCookie(null);
+        INSTANCE.getCrumb(null);
+        if (ifCookieAndCrumbValid()) return true;
+        return false;
     }
 
 
-    public boolean ifCookieAndCrumbValid(){
-        return ifCookieValid()&& !StringUtils.isEmpty(crumb);
+    public boolean ifCookieAndCrumbValid() {
+        return ifCookieValid() && !StringUtils.isEmpty(crumb);
     }
 
     /**

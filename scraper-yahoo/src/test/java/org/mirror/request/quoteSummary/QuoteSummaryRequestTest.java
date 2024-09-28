@@ -1,6 +1,5 @@
 package org.mirror.request.quoteSummary;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.io.EofSensorInputStream;
@@ -9,7 +8,6 @@ import org.mirror.DTO.quoteSummary.QuoteSummary;
 import org.mirror.DTO.quoteSummary.QuoteSummaryWrapper;
 import org.mirror.DTO.quoteSummary.moduleInfo.finanacialData.FinancialData;
 import org.mirror.gernerator.ModuleWrapperGenerator;
-import org.mirror.request.quote.QuoteRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,7 +28,7 @@ public class QuoteSummaryRequestTest {
     @Test
     void testGetResponseEntityWithInit() {
         QuoteSummaryRequest qr = new QuoteSummaryRequest();
-        qr.init("MSFT", "cashFlowStatementHistoryQuarterly");
+        qr.init("MSFT", "assetProfile","price");
         System.out.println(qr.getResponseBodyAsObject(QuoteSummaryWrapper.class).getQuoteSummary());
         log.info("finished");
     }

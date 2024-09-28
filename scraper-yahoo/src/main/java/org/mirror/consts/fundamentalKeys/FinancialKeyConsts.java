@@ -1,4 +1,4 @@
-package org.mirror.httpConsts.fundamentalKeys;
+package org.mirror.consts.fundamentalKeys;
 
 public class FinancialKeyConsts {
     public static final String TAX_EFFECT_OF_UNUSUAL_ITEMS = "TaxEffectOfUnusualItems";

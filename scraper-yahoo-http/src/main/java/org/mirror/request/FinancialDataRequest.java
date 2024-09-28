@@ -16,5 +16,12 @@ public interface FinancialDataRequest<T extends ResponseWrapper> {
      * Turning the response into an Object may be dependent on the concrete implementation.
      * @return The POJO that is turned from a response body.
      */
-    T getResponseBodyAsObject();
+
+
+    /**
+     * Turning the response into an Object may be dependent on the concrete implementation.
+     * @param type Type of T, which is the type of the POJO.
+     * @return The POJO that is turned from a response body.
+     */
+    T getResponseBodyAsObject(Class<T> type);
 }

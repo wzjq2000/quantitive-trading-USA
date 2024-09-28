@@ -1,12 +1,23 @@
-package org.mirror.httpConsts;
+package org.mirror.consts;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Set;
+
+
+/**
+ * https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=xxx,yyy,zzz&corsDomain=finance.yahoo.com&formatted=false
+ */
 public class QuoteSummaryModuleConsts {
+    public static final Set<String> MODULE_SET = new HashSet<String>();
+
 
     // contains general information about the company
     public static final String SUMMARY_PROFILE = "summaryProfile";
 
     // prices + volume + market cap + etc
-    public static final String SUMMARY_DETAIL = "summaryDetail";
+    public static final String SUMMARY_DETAIL = "summaryDetail"; 
     public static final String ASSET_PROFILE = "assetProfile";
     public static final String FUND_PROFILE = "fundProfile";
 
@@ -19,7 +30,7 @@ public class QuoteSummaryModuleConsts {
     // Environmental, social, and governance (ESG) scores, sustainability and ethical performance of companies
     public static final String ESG_SCORES = "esgScores";
     public static final String INCOME_STATEMENT_HISTORY = "incomeStatementHistory";
-    public static final String INCOME_STATEMENT_HISTORY_QUARTERLY = "incomeStatementHistoryQuarterly";
+    public static final String INCOME_STATEMENT_HISTORY_QUARTERLY = "incomeStatementHistoryQuarterly"; 
     public static final String BALANCE_SHEET_HISTORY = "balanceSheetHistory";
     public static final String BALANCE_SHEET_HISTORY_QUARTERLY = "balanceSheetHistoryQuarterly";
     public static final String CASH_FLOW_STATEMENT_HISTORY = "cashFlowStatementHistory";
@@ -45,7 +56,7 @@ public class QuoteSummaryModuleConsts {
 
     // mutual fund ownership, holders and shares outstanding
     public static final String FUND_OWNERSHIP = "fundOwnership";
-    public static final String MAJOR_DIRECT_HOLDERS = "majorDirectHolders";
+    public static final String MAJOR_DIRECT_HOLDERS = "majorDirectHolders";  // I have tested several symbols, and none of them showing valid answers
     public static final String MAJOR_HOLDERS_BREAKDOWN = "majorHoldersBreakdown";
 
     // insider transactions, such as the number of shares bought and sold by company executives
@@ -64,10 +75,23 @@ public class QuoteSummaryModuleConsts {
     // earnings trend
     public static final String EARNINGS_TREND = "earningsTrend";
 
-    public static final String INDUSTRY_TREND = "industryTrend";
+    public static final String INDUSTRY_TREND = "industryTrend";// did not find any valid data using this module
     public static final String INDEX_TREND = "indexTrend";
-    public static final String SECTOR_TREND = "sectorTrend";
+    public static final String SECTOR_TREND = "sectorTrend";// did not find any valid data using this module
     public static final String RECOMMENDATION_TREND = "recommendationTrend";
-    public static final String FUTURES_CHAIN = "futuresChain";
+    public static final String FUTURES_CHAIN = "futuresChain";// did not find any valid data using this module 
 
+
+    static {
+        Field[] declaredFields = QuoteSummaryModuleConsts.class.getDeclaredFields();
+        for (Field field : declaredFields) {
+            if (Modifier.isStatic(field.getModifiers()) && field.getType().equals(String.class)) {
+                try {
+                    MODULE_SET.add((String) field.get(null));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
 }

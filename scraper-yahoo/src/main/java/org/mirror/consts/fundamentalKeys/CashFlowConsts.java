@@ -1,4 +1,4 @@
-package org.mirror.httpConsts.fundamentalKeys;
+package org.mirror.consts.fundamentalKeys;
 
 public class CashFlowConsts {
     public static final String FOREIGN_SALES = "ForeignSales";

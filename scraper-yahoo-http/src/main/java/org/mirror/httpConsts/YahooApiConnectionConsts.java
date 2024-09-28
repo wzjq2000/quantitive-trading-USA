@@ -1,4 +1,4 @@
-package org.mirror.httpConsts.httpBasic;
+package org.mirror.httpConsts;
 
 public class YahooApiConnectionConsts {
     public static final String GET_CRUMB_URL = "https://query1.finance.yahoo.com/v1/test/getcrumb";

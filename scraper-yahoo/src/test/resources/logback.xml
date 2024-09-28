@@ -1,0 +1,38 @@
+<configuration>
+    <property name="console_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+    　　　
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        　　　　　
+        <encoder>
+            　　　　　　　　　
+            <pattern>${console_pattern}</pattern>
+            　　　　　
+        </encoder>
+        　　　
+    </appender>
+
+    <appender name="ROLL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/test.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/test.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <!-- 设置日志输出格式 -->
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+
+    </appender>
+
+
+    　　　
+    <root level="INFO">
+        　　　　　　
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROLL"/>
+        　　　
+    </root>
+</configuration>

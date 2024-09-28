@@ -8,15 +8,14 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.mirror.exception.WrongCookieException;
 import org.mirror.httpConsts.httpBasic.UserAgent;
-import org.mirror.httpConsts.httpBasic.YahooApiConnectionConsts;
+import org.mirror.httpConsts.YahooApiConnectionConsts;
 import lombok.extern.slf4j.Slf4j;
+import util.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -72,6 +71,9 @@ public class ConnectionManager {
     }
 
 
+    public boolean ifCookieAndCrumbValid(){
+        return ifCookieValid()&& !StringUtils.isEmpty(crumb);
+    }
 
     /**
      * Make http request for getting the crumb.
@@ -111,6 +113,7 @@ public class ConnectionManager {
                     if (crumb != null && requestCookieTimes == requestCrumbTimes) {
                         return crumb;
                     }
+                    log.info("Crumb not existing, so we try to request the crumb...");
                     try (CloseableHttpResponse response = client.execute(httpGet)) {
                         if (response.getCode() == 200) {
                             crumb = EntityUtils.toString(response.getEntity());
@@ -148,7 +151,9 @@ public class ConnectionManager {
      * @return Cookie
      */
     String getCookie(Map<String, String> headers) throws IOException {
-        if (ifCookieValid()) return cookie;
+        if (ifCookieValid()) {
+            return cookie;
+        }
 
 
         // In order to get the cookie, the header must not contain cookie.
@@ -171,6 +176,8 @@ public class ConnectionManager {
             if (ifCookieValid()) return cookie;
             cookieLock.lock();
             if (ifCookieValid()) return cookie;
+            log.info("Cookie not existing, so we try to request the Cookie...");
+
             try (CloseableHttpResponse response = client.execute(httpGet)) {
                 cookie = response.getFirstHeader("Set-Cookie").getValue();
                 if (cookie == null) {

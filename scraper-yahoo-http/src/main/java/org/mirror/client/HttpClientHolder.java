@@ -9,6 +9,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.mirror.exception.WrongCookieAndCrumbException;
 import org.mirror.exception.WrongUrlException;
 import org.mirror.httpConsts.httpBasic.URLConstants;
 import org.mirror.httpConsts.httpBasic.UserAgent;
@@ -42,7 +43,7 @@ public class HttpClientHolder {
 
     private static CloseableHttpClient getHttpClient(String httpClientKey) {
         if (StringUtils.isEmpty(httpClientKey) || httpClientKey.equals("default")) {
-            log.info("Making http call using default client.");
+            log.debug("Making http call using default client.");
             return DEFAULT;
         }
         CloseableHttpClient httpClient = map.get(httpClientKey);
@@ -107,8 +108,11 @@ public class HttpClientHolder {
     }
 
     public static Object makeHttpCallForResponseBody(String httpClientKey, HttpRequestBuilder builder, JsonInputStreamToObject func, ObjectMapperWrapper mapperWrapper) throws IOException, ParseException {
+        if(!ConnectionManager.getInstance().ifCookieAndCrumbValid()){
+            log.error("You cannot make a http call without valid Cookie and crumb");
+            throw new WrongCookieAndCrumbException("Please retry with valid cookie and crumb to make a http call.");
+        }
         CloseableHttpClient httpClient = getHttpClient(httpClientKey);
-
 
         HttpUriRequest request = builder.build();
         Object respBody = null;
@@ -195,7 +199,7 @@ public class HttpClientHolder {
                 url = url.substring(0, url.length() - 1);
             }
             if (StringUtils.isEmpty(method)) {
-                log.info("Request method is empty, thus we will use GET method by default.");
+                log.debug("Request method is empty, thus we will use GET method by default.");
                 method = "GET";
             }
 
@@ -220,7 +224,8 @@ public class HttpClientHolder {
                 request.addHeader(entry.getKey(), entry.getValue());
             }
 
-            log.info("Request URL: [" + newURL + "], with header: [" + headers + "]");
+            log.info("Request URL: {}", newURL);
+//            log.debug("Request URL: [" + newURL + "], with header: [" + headers + "]");
 
 
             return request;

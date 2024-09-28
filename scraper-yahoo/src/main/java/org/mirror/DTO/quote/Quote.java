@@ -2,6 +2,8 @@ package org.mirror.DTO.quote;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class Quote {
     // basic info
@@ -41,28 +43,28 @@ public class Quote {
     private Long firstTradeDateMilliseconds;
 
     // regular market
-    private Double regularMarketOpen;
-    private Double regularMarketPrice;
-    private Double regularMarketChangePercent;
-    private Double regularMarketChange;
+    private BigDecimal regularMarketOpen;
+    private BigDecimal regularMarketPrice;
+    private BigDecimal regularMarketChangePercent;
+    private BigDecimal regularMarketChange;
     private Long regularMarketTime;
-    private Double regularMarketDayHigh;
+    private BigDecimal regularMarketDayHigh;
     private String regularMarketDayRange;
-    private Double regularMarketDayLow;
+    private BigDecimal regularMarketDayLow;
     private Long regularMarketVolume;
-    private Double regularMarketPreviousClose;
+    private BigDecimal regularMarketPreviousClose;
 
 
     // post market
-    private Double postMarketChangePercent;
+    private BigDecimal postMarketChangePercent;
     private Long postMarketTime;
-    private Double postMarketPrice;
-    private Double postMarketChange;
+    private BigDecimal postMarketPrice;
+    private BigDecimal postMarketChange;
 
 
     // bid and ask
-    private Double bid;
-    private Double ask;
+    private BigDecimal bid;
+    private BigDecimal ask;
     private Integer bidSize;
     private Integer askSize;
 
@@ -74,41 +76,41 @@ public class Quote {
 
     // market indicator
     private Long marketCap;
-    private Double trailingPE;  // TTM
-    private Double forwardPE;  // expected PE
-    private Double priceToBook;
+    private BigDecimal trailingPE;  // TTM
+    private BigDecimal forwardPE;  // expected PE
+    private BigDecimal priceToBook;
 
 
     // technical indicator
-    private Double fiftyDayAverage;
-    private Double fiftyDayAverageChange;
-    private Double fiftyDayAverageChangePercent;
-    private Double twoHundredDayAverage;
-    private Double twoHundredDayAverageChange;
-    private Double twoHundredDayAverageChangePercent;
+    private BigDecimal fiftyDayAverage;
+    private BigDecimal fiftyDayAverageChange;
+    private BigDecimal fiftyDayAverageChangePercent;
+    private BigDecimal twoHundredDayAverage;
+    private BigDecimal twoHundredDayAverageChange;
+    private BigDecimal twoHundredDayAverageChangePercent;
     private String averageAnalystRating;
 
 
     // 52-week indicator
-    private Double fiftyTwoWeekLowChange;
-    private Double fiftyTwoWeekLowChangePercent;
+    private BigDecimal fiftyTwoWeekLowChange;
+    private BigDecimal fiftyTwoWeekLowChangePercent;
     private String fiftyTwoWeekRange;
-    private Double fiftyTwoWeekHighChange;
-    private Double fiftyTwoWeekHighChangePercent;
-    private Double fiftyTwoWeekLow;
-    private Double fiftyTwoWeekHigh;
-    private Double fiftyTwoWeekChangePercent;
+    private BigDecimal fiftyTwoWeekHighChange;
+    private BigDecimal fiftyTwoWeekHighChangePercent;
+    private BigDecimal fiftyTwoWeekLow;
+    private BigDecimal fiftyTwoWeekHigh;
+    private BigDecimal fiftyTwoWeekChangePercent;
 
     // fiscal indicator
-    private Double bookValue;
-    private Double trailingAnnualDividendRate;
-    private Double dividendRate;
-    private Double trailingAnnualDividendYield;
-    private Double dividendYield;
-    private Double epsTrailingTwelveMonths;
-    private Double epsForward;
-    private Double epsCurrentYear;
-    private Double priceEpsCurrentYear;
+    private BigDecimal bookValue;
+    private BigDecimal trailingAnnualDividendRate;
+    private BigDecimal dividendRate;
+    private BigDecimal trailingAnnualDividendYield;
+    private BigDecimal dividendYield;
+    private BigDecimal epsTrailingTwelveMonths;
+    private BigDecimal epsForward;
+    private BigDecimal epsCurrentYear;
+    private BigDecimal priceEpsCurrentYear;
 
 
     // other company info

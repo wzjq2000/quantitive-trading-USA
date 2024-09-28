@@ -3,6 +3,7 @@ package org.mirror.DTO;
 import consts.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 // why would I write this class in the first place??
@@ -19,15 +20,15 @@ public class FinancialProductMeta {
     private Long gmtOffset;
     private TimezoneEnum timezone;
     private ExchangeTimezoneNameEnum exchangeTimezoneName;
-    private Double regularMarketPrice;
-    private Double fiftyTwoWeekHigh;
-    private Double fiftyTwoWeekLow;
-    private Double regularMarketDayHigh;
-    private Double regularMarketDayLow;
-    private Double regularMarketVolume;
+    private BigDecimal regularMarketPrice;
+    private BigDecimal fiftyTwoWeekHigh;
+    private BigDecimal fiftyTwoWeekLow;
+    private BigDecimal regularMarketDayHigh;
+    private BigDecimal regularMarketDayLow;
+    private BigDecimal regularMarketVolume;
     private String longName;
     private String shortName;
-    private Double chartPreviousClose;
+    private BigDecimal chartPreviousClose;
     private Integer priceHint;  // 精度
     private List<CurrentTradingPeriod> currentTradingPeriod;  // pre, regular, post
     private DataGranularityEnum dataGranularity;

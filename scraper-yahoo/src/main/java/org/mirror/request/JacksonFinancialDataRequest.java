@@ -18,13 +18,13 @@ public class JacksonFinancialDataRequest<T extends ResponseWrapper> extends Abst
     protected ObjectMapperWrapper<ObjectMapper> mapperWrapper = ObjectMapperWrapperManager.getInstance().getJsonObjectMapperWrapper("jackson");
 
     @Override
-    public T getResponseBodyAsObject() {
+    public T getResponseBodyAsObject(Class<T> type) {
         checkInit();
         if (responseWrapper != null) {
             return responseWrapper;
         }
         try {
-            responseWrapper = (T) holder.makeHttpCallForResponseBody(requestBuilder, (mapperWrapper, inputStream) -> mapperWrapper.map(inputStream, QuoteResponseWrapper.class), mapperWrapper);
+            responseWrapper = (T) holder.makeHttpCallForResponseBody(requestBuilder, (mapperWrapper, inputStream) -> mapperWrapper.map(inputStream, type), mapperWrapper);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ParseException e) {

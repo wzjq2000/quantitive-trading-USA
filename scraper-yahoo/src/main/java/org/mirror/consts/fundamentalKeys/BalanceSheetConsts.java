@@ -1,4 +1,4 @@
-package org.mirror.httpConsts.fundamentalKeys;
+package org.mirror.consts.fundamentalKeys;
 
 public class BalanceSheetConsts {
     public static final String TREASURY_SHARES_NUMBER = "TreasurySharesNumber";
